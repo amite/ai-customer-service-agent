@@ -58,3 +58,1133 @@ Reviewing the Architecture section in README.md and comparing it with the curren
 
 ---
 
+
+Analyzing the Architecture section and comparing it with the actual codebase implementation.
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="semantic_search_full">
+<details>
+<summary>Tool use: **semantic_search_full**</summary>
+
+
+Parameters:
+
+```json
+{
+  "query": "How does the agent call tools and interact with the vector store?",
+  "topK": 10,
+  "explanation": ""
+}
+```
+Result:
+
+```json
+{
+  "codeResults": [
+    {
+      "codeBlock": {
+        "relativeWorkspacePath": "./README.md",
+        "range": {
+          "startPosition": {
+            "line": 220
+          },
+          "endPosition": {
+            "line": 288,
+            "column": 3
+          }
+        },
+        "contents": "def create_customer_service_agent():\n    # 1. Initialize LLM\n    llm = ChatOllama(\n        model=\"llama3.1:8b-instruct-q4_K_M\",\n        temperature=0,  # Deterministic for consistent behavior\n    )\n    \n    # 2. Define available tools (including vector search!)\n    tools = [\n        lookup_order, \n        check_product_availability,\n        search_products_semantic,  # AI-powered product search\n        search_knowledge_base,      # AI-powered FAQ search  \n        process_refund_request\n    ]\n    \n    # 3. Create prompt template\n    prompt = ChatPromptTemplate.from_messages([\n        (\"system\", \"You are a helpful customer service agent...\"),\n        MessagesPlaceholder(variable_name=\"chat_history\", optional=True),\n        (\"human\", \"{input}\"),\n        MessagesPlaceholder(variable_name=\"agent_scratchpad\"),\n    ])\n    \n    # 4. Create tool-calling agent\n    agent = create_tool_calling_agent(llm, tools, prompt)\n    \n    # 5. Wrap in executor\n    agent_executor = AgentExecutor(\n        agent=agent,\n        tools=tools,\n        verbose=True,\n        max_iterations=5,\n    )\n    \n    return agent_executor\n&#96;&#96;&#96;\n\n**Breakdown:**\n\n- **LLM**: The \"brain\" that decides which tools to call\n- **Tools**: Functions the agent can execute\n- **Prompt**: Instructions for agent behavior\n- **Agent**: Decision-making logic\n- **AgentExecutor**: Orchestrates the tool-calling loop\n\n### 3. The Tool-Calling Loop (with Vector Search!)\n\nWhen you invoke the agent with a semantic query:\n\n&#96;&#96;&#96;python\nresponse = agent.invoke({\n    \"input\": \"I need something for gaming\",\n    \"chat_history\": []\n})\n&#96;&#96;&#96;\n\nThis happens behind the scenes:\n\n&#96;&#96;&#96;\n1. User Input → Agent\n2. Agent analyzes request → Recognizes descriptive query (not exact product name)\n3. Agent decides to use \"search_products_semantic\" tool\n4. Tool converts query to embedding vector using mxbai-embed-large\n5. Qdrant finds most similar product vectors\n6. Tool returns: [{\"name\": \"Mechanical Keyboard\", \"relevance\": \"94.2%\", ...}]\n7. Agent receives results → Formulates natural response\n8. Agent returns: \"I found some great gaming products! Our Mechanical Keyboard \n   ",
+        "signatures": {},
+        "detailedLines": [
+          {
+            "text": "def create_customer_service_agent():",
+            "lineNumber": 221
+          },
+          {
+            "text": "    # 1. Initialize LLM",
+            "lineNumber": 222
+          },
+          {
+            "text": "    llm = ChatOllama(",
+            "lineNumber": 223
+          },
+          {
+            "text": "        model=\"llama3.1:8b-instruct-q4_K_M\",",
+            "lineNumber": 224
+          },
+          {
+            "text": "        temperature=0,  # Deterministic for consistent behavior",
+            "lineNumber": 225
+          },
+          {
+            "text": "    )",
+            "lineNumber": 226
+          },
+          {
+            "text": "    ",
+            "lineNumber": 227
+          },
+          {
+            "text": "    # 2. Define available tools (including vector search!)",
+            "lineNumber": 228
+          },
+          {
+            "text": "    tools = [",
+            "lineNumber": 229
+          },
+          {
+            "text": "        lookup_order, ",
+            "lineNumber": 230
+          },
+          {
+            "text": "        check_product_availability,",
+            "lineNumber": 231
+          },
+          {
+            "text": "        search_products_semantic,  # AI-powered product search",
+            "lineNumber": 232
+          },
+          {
+            "text": "        search_knowledge_base,      # AI-powered FAQ search  ",
+            "lineNumber": 233
+          },
+          {
+            "text": "        process_refund_request",
+            "lineNumber": 234
+          },
+          {
+            "text": "    ]",
+            "lineNumber": 235
+          },
+          {
+            "text": "    ",
+            "lineNumber": 236
+          },
+          {
+            "text": "    # 3. Create prompt template",
+            "lineNumber": 237
+          },
+          {
+            "text": "    prompt = ChatPromptTemplate.from_messages([",
+            "lineNumber": 238
+          },
+          {
+            "text": "        (\"system\", \"You are a helpful customer service agent...\"),",
+            "lineNumber": 239
+          },
+          {
+            "text": "        MessagesPlaceholder(variable_name=\"chat_history\", optional=True),",
+            "lineNumber": 240
+          },
+          {
+            "text": "        (\"human\", \"{input}\"),",
+            "lineNumber": 241
+          },
+          {
+            "text": "        MessagesPlaceholder(variable_name=\"agent_scratchpad\"),",
+            "lineNumber": 242
+          },
+          {
+            "text": "    ])",
+            "lineNumber": 243
+          },
+          {
+            "text": "    ",
+            "lineNumber": 244
+          },
+          {
+            "text": "    # 4. Create tool-calling agent",
+            "lineNumber": 245
+          },
+          {
+            "text": "    agent = create_tool_calling_agent(llm, tools, prompt)",
+            "lineNumber": 246
+          },
+          {
+            "text": "    ",
+            "lineNumber": 247
+          },
+          {
+            "text": "    # 5. Wrap in executor",
+            "lineNumber": 248
+          },
+          {
+            "text": "    agent_executor = AgentExecutor(",
+            "lineNumber": 249
+          },
+          {
+            "text": "        agent=agent,",
+            "lineNumber": 250
+          },
+          {
+            "text": "        tools=tools,",
+            "lineNumber": 251
+          },
+          {
+            "text": "        verbose=True,",
+            "lineNumber": 252
+          },
+          {
+            "text": "        max_iterations=5,",
+            "lineNumber": 253
+          },
+          {
+            "text": "    )",
+            "lineNumber": 254
+          },
+          {
+            "text": "    ",
+            "lineNumber": 255
+          },
+          {
+            "text": "    return agent_executor",
+            "lineNumber": 256
+          },
+          {
+            "text": "&#96;&#96;&#96;",
+            "lineNumber": 257
+          },
+          {
+            "lineNumber": 258
+          },
+          {
+            "text": "**Breakdown:**",
+            "lineNumber": 259
+          },
+          {
+            "lineNumber": 260
+          },
+          {
+            "text": "- **LLM**: The \"brain\" that decides which tools to call",
+            "lineNumber": 261
+          },
+          {
+            "text": "- **Tools**: Functions the agent can execute",
+            "lineNumber": 262
+          },
+          {
+            "text": "- **Prompt**: Instructions for agent behavior",
+            "lineNumber": 263
+          },
+          {
+            "text": "- **Agent**: Decision-making logic",
+            "lineNumber": 264
+          },
+          {
+            "text": "- **AgentExecutor**: Orchestrates the tool-calling loop",
+            "lineNumber": 265
+          },
+          {
+            "lineNumber": 266
+          },
+          {
+            "text": "### 3. The Tool-Calling Loop (with Vector Search!)",
+            "lineNumber": 267
+          },
+          {
+            "lineNumber": 268
+          },
+          {
+            "text": "When you invoke the agent with a semantic query:",
+            "lineNumber": 269
+          },
+          {
+            "lineNumber": 270
+          },
+          {
+            "text": "&#96;&#96;&#96;python",
+            "lineNumber": 271
+          },
+          {
+            "text": "response = agent.invoke({",
+            "lineNumber": 272
+          },
+          {
+            "text": "    \"input\": \"I need something for gaming\",",
+            "lineNumber": 273
+          },
+          {
+            "text": "    \"chat_history\": []",
+            "lineNumber": 274
+          },
+          {
+            "text": "})",
+            "lineNumber": 275
+          },
+          {
+            "text": "&#96;&#96;&#96;",
+            "lineNumber": 276
+          },
+          {
+            "lineNumber": 277
+          },
+          {
+            "text": "This happens behind the scenes:",
+            "lineNumber": 278
+          },
+          {
+            "lineNumber": 279
+          },
+          {
+            "text": "&#96;&#96;&#96;",
+            "lineNumber": 280
+          },
+          {
+            "text": "1. User Input → Agent",
+            "lineNumber": 281
+          },
+          {
+            "text": "2. Agent analyzes request → Recognizes descriptive query (not exact product name)",
+            "lineNumber": 282
+          },
+          {
+            "text": "3. Agent decides to use \"search_products_semantic\" tool",
+            "lineNumber": 283
+          },
+          {
+            "text": "4. Tool converts query to embedding vector using mxbai-embed-large",
+            "lineNumber": 284
+          },
+          {
+            "text": "5. Qdrant finds most similar product vectors",
+            "lineNumber": 285
+          },
+          {
+            "text": "6. Tool returns: [{\"name\": \"Mechanical Keyboard\", \"relevance\": \"94.2%\", ...}]",
+            "lineNumber": 286
+          },
+          {
+            "text": "7. Agent receives results → Formulates natural response",
+            "lineNumber": 287
+          },
+          {
+            "text": "8. Agent returns: \"I found some great gaming products! Our Mechanical Keyboard ",
+            "lineNumber": 288
+          },
+          {
+            "text": "   ",
+            "lineNumber": 289
+          }
+        ]
+      },
+      "score": 0.5039950609207153
+    },
+    {
+      "codeBlock": {
+        "relativeWorkspacePath": "./src/agents/customer_service_agent.py",
+        "range": {
+          "startPosition": {
+            "line": 328,
+            "column": 6
+          },
+          "endPosition": {
+            "line": 410
+          }
+        },
+        "contents": "# =============================================================================\n# AGENT SETUP: Initialize LangChain components\n# =============================================================================\n\ndef create_customer_service_agent():\n    \"\"\"\n    Creates and configures the customer service agent with LangChain.\n    Now includes vector search capabilities!\n    \n    Returns:\n        AgentExecutor configured with tools and LLM\n    \"\"\"\n    # Initialize Ollama LLM\n    # Note: llama3.1 supports tool calling natively\n    llm = ChatOllama(\n        model=\"llama3.1:8b-instruct-q4_K_M\",\n        temperature=0,  # Use 0 for more deterministic responses\n        num_predict=512,  # Max tokens to generate\n    )\n    \n    # Compile list of available tools (now includes vector search!)\n    tools = [\n        lookup_order,\n        check_product_availability,\n        search_products_semantic,  # NEW: AI-powered product search\n        search_knowledge_base,      # NEW: AI-powered FAQ search\n        process_refund_request\n    ]\n    \n    # Create the prompt template for the agent\n    # This defines how the agent should behave and use tools\n    prompt",
+        "signatures": {},
+        "detailedLines": [
+          {
+            "text": "# =============================================================================",
+            "lineNumber": 332
+          },
+          {
+            "text": "# AGENT SETUP: Initialize LangChain components",
+            "lineNumber": 333
+          },
+          {
+            "text": "# =============================================================================",
+            "lineNumber": 334
+          },
+          {
+            "lineNumber": 335
+          },
+          {
+            "text": "def create_customer_service_agent():",
+            "lineNumber": 336,
+            "isSignature": true
+          },
+          {
+            "text": "    \"\"\"",
+            "lineNumber": 337
+          },
+          {
+            "text": "    Creates and configures the customer service agent with LangChain.",
+            "lineNumber": 338
+          },
+          {
+            "text": "    Now includes vector search capabilities!",
+            "lineNumber": 339
+          },
+          {
+            "text": "    ",
+            "lineNumber": 340
+          },
+          {
+            "text": "    Returns:",
+            "lineNumber": 341
+          },
+          {
+            "text": "        AgentExecutor configured with tools and LLM",
+            "lineNumber": 342
+          },
+          {
+            "text": "    \"\"\"",
+            "lineNumber": 343
+          },
+          {
+            "text": "    # Initialize Ollama LLM",
+            "lineNumber": 344
+          },
+          {
+            "text": "    # Note: llama3.1 supports tool calling natively",
+            "lineNumber": 345
+          },
+          {
+            "text": "    llm = ChatOllama(",
+            "lineNumber": 346
+          },
+          {
+            "text": "        model=\"llama3.1:8b-instruct-q4_K_M\",",
+            "lineNumber": 347
+          },
+          {
+            "text": "        temperature=0,  # Use 0 for more deterministic responses",
+            "lineNumber": 348
+          },
+          {
+            "text": "        num_predict=512,  # Max tokens to generate",
+            "lineNumber": 349
+          },
+          {
+            "text": "    )",
+            "lineNumber": 350
+          },
+          {
+            "text": "    ",
+            "lineNumber": 351
+          },
+          {
+            "text": "    # Compile list of available tools (now includes vector search!)",
+            "lineNumber": 352
+          },
+          {
+            "text": "    tools = [",
+            "lineNumber": 353
+          },
+          {
+            "text": "        lookup_order,",
+            "lineNumber": 354
+          },
+          {
+            "text": "        check_product_availability,",
+            "lineNumber": 355
+          },
+          {
+            "text": "        search_products_semantic,  # NEW: AI-powered product search",
+            "lineNumber": 356
+          },
+          {
+            "text": "        search_knowledge_base,      # NEW: AI-powered FAQ search",
+            "lineNumber": 357
+          },
+          {
+            "text": "        process_refund_request",
+            "lineNumber": 358
+          },
+          {
+            "text": "    ]",
+            "lineNumber": 359
+          },
+          {
+            "text": "    ",
+            "lineNumber": 360
+          },
+          {
+            "text": "    # Create the prompt template for the agent",
+            "lineNumber": 361
+          },
+          {
+            "text": "    # This defines how the agent should behave and use tools",
+            "lineNumber": 362
+          },
+          {
+            "text": "    prompt",
+            "lineNumber": 363
+          }
+        ]
+      },
+      "score": 0.4722104072570801
+    },
+    {
+      "codeBlock": {
+        "relativeWorkspacePath": "./src/agents/customer_service_agent.py",
+        "range": {
+          "startPosition": {
+            "line": 335
+          },
+          "endPosition": {
+            "line": 410
+          }
+        },
+        "contents": "def create_customer_service_agent():\n\n    \n    # Create the prompt template for the agent\n    # This defines how the agent should behave and use tools\n    prompt = ChatPromptTemplate.from_messages([\n        (\"system\", \"\"\"You are a helpful customer service agent for TechStore, an online electronics retailer.\n\nYour role is to:\n- Help customers track their orders\n- Check product availability and pricing\n- Recommend products based on customer needs (using semantic search)\n- Answer policy questions using the knowledge base\n- Process refund requests when eligible\n- Provide friendly, professional assistance\n\nGuidelines:\n- Always verify customer email when handling sensitive operations (orders, refunds)\n- Be empathetic and understanding\n- Explain policies clearly (e.g., 30-day refund window)\n- Use the available tools to get accurate, real-time information\n- If you need information from the customer (like email or order ID), politely ask for it\n\nIMPORTANT - Tool Selection:\n- Use 'check_product_availability' for EXACT product name lookups (e.g., \"do you have Wireless Headphones?\")\n- Use 'search_products_semantic' for DESCRIPTIVE queries (e.g., \"I need something for gaming\", \"wireless audio equipment\")\n- Use 'search_knowledge_base' for policy/process questions (e.g., \"how do returns work?\", \"what's your shipping policy?\")\n- Use 'lookup_order' for order status checks\n- Use 'process_refund_request' for returns/refunds\n\nUse the available tools to get accurate information when needed.\n\"\"\"),\n        # Placeholder for conversation history\n        MessagesPlaceholder(variable_name=\"chat_history\", optional=True),\n        # Current user message\n        (\"human\", \"{input}\"),\n        # Placeholder for agent's tool-calling scratchpad\n        MessagesPlaceholder(variable_name=\"agent_scratchpad\"),\n    ])\n    \n    # Create the tool-calling agent\n    # This agent knows how to use tools based on the conversation\n    agent = create_tool_calling_agent(llm, tools, prompt)\n    \n    # Wrap in AgentExecutor to handle the tool-calling loop\n    agent_executor",
+        "signatures": {
+          "ranges": [
+            {
+              "startPosition": {
+                "line": 336,
+                "column": 1
+              },
+              "endPosition": {
+                "line": 337,
+                "column": 5
+              }
+            }
+          ]
+        },
+        "detailedLines": [
+          {
+            "text": "def create_customer_service_agent():",
+            "lineNumber": 336,
+            "isSignature": true
+          },
+          {
+            "lineNumber": 359
+          },
+          {
+            "text": "    ",
+            "lineNumber": 360
+          },
+          {
+            "text": "    # Create the prompt template for the agent",
+            "lineNumber": 361
+          },
+          {
+            "text": "    # This defines how the agent should behave and use tools",
+            "lineNumber": 362
+          },
+          {
+            "text": "    prompt = ChatPromptTemplate.from_messages([",
+            "lineNumber": 363
+          },
+          {
+            "text": "        (\"system\", \"\"\"You are a helpful customer service agent for TechStore, an online electronics retailer.",
+            "lineNumber": 364
+          },
+          {
+            "lineNumber": 365
+          },
+          {
+            "text": "Your role is to:",
+            "lineNumber": 366
+          },
+          {
+            "text": "- Help customers track their orders",
+            "lineNumber": 367
+          },
+          {
+            "text": "- Check product availability and pricing",
+            "lineNumber": 368
+          },
+          {
+            "text": "- Recommend products based on customer needs (using semantic search)",
+            "lineNumber": 369
+          },
+          {
+            "text": "- Answer policy questions using the knowledge base",
+            "lineNumber": 370
+          },
+          {
+            "text": "- Process refund requests when eligible",
+            "lineNumber": 371
+          },
+          {
+            "text": "- Provide friendly, professional assistance",
+            "lineNumber": 372
+          },
+          {
+            "lineNumber": 373
+          },
+          {
+            "text": "Guidelines:",
+            "lineNumber": 374
+          },
+          {
+            "text": "- Always verify customer email when handling sensitive operations (orders, refunds)",
+            "lineNumber": 375
+          },
+          {
+            "text": "- Be empathetic and understanding",
+            "lineNumber": 376
+          },
+          {
+            "text": "- Explain policies clearly (e.g., 30-day refund window)",
+            "lineNumber": 377
+          },
+          {
+            "text": "- Use the available tools to get accurate, real-time information",
+            "lineNumber": 378
+          },
+          {
+            "text": "- If you need information from the customer (like email or order ID), politely ask for it",
+            "lineNumber": 379
+          },
+          {
+            "lineNumber": 380
+          },
+          {
+            "text": "IMPORTANT - Tool Selection:",
+            "lineNumber": 381
+          },
+          {
+            "text": "- Use 'check_product_availability' for EXACT product name lookups (e.g., \"do you have Wireless Headphones?\")",
+            "lineNumber": 382
+          },
+          {
+            "text": "- Use 'search_products_semantic' for DESCRIPTIVE queries (e.g., \"I need something for gaming\", \"wireless audio equipment\")",
+            "lineNumber": 383
+          },
+          {
+            "text": "- Use 'search_knowledge_base' for policy/process questions (e.g., \"how do returns work?\", \"what's your shipping policy?\")",
+            "lineNumber": 384
+          },
+          {
+            "text": "- Use 'lookup_order' for order status checks",
+            "lineNumber": 385
+          },
+          {
+            "text": "- Use 'process_refund_request' for returns/refunds",
+            "lineNumber": 386
+          },
+          {
+            "lineNumber": 387
+          },
+          {
+            "text": "Use the available tools to get accurate information when needed.",
+            "lineNumber": 388
+          },
+          {
+            "text": "\"\"\"),",
+            "lineNumber": 389
+          },
+          {
+            "text": "        # Placeholder for conversation history",
+            "lineNumber": 390
+          },
+          {
+            "text": "        MessagesPlaceholder(variable_name=\"chat_history\", optional=True),",
+            "lineNumber": 391
+          },
+          {
+            "text": "        # Current user message",
+            "lineNumber": 392
+          },
+          {
+            "text": "        (\"human\", \"{input}\"),",
+            "lineNumber": 393
+          },
+          {
+            "text": "        # Placeholder for agent's tool-calling scratchpad",
+            "lineNumber": 394
+          },
+          {
+            "text": "        MessagesPlaceholder(variable_name=\"agent_scratchpad\"),",
+            "lineNumber": 395
+          },
+          {
+            "text": "    ])",
+            "lineNumber": 396
+          },
+          {
+            "text": "    ",
+            "lineNumber": 397
+          },
+          {
+            "text": "    # Create the tool-calling agent",
+            "lineNumber": 398
+          },
+          {
+            "text": "    # This agent knows how to use tools based on the conversation",
+            "lineNumber": 399
+          },
+          {
+            "text": "    agent = create_tool_calling_agent(llm, tools, prompt)",
+            "lineNumber": 400
+          },
+          {
+            "text": "    ",
+            "lineNumber": 401
+          },
+          {
+            "text": "    # Wrap in AgentExecutor to handle the tool-calling loop",
+            "lineNumber": 402
+          },
+          {
+            "text": "    agent_executor",
+            "lineNumber": 403
+          }
+        ]
+      },
+      "score": 0.4527589976787567
+    },
+    {
+      "codeBlock": {
+        "relativeWorkspacePath": "./src/agents/customer_service_agent.py",
+        "range": {
+          "startPosition": {
+            "line": 214,
+            "column": 6
+          },
+          "endPosition": {
+            "line": 328
+          }
+        },
+        "contents": "@tool\ndef search_knowledge_base(question: str) -&gt; str:\n    \"\"\"\n    Search the FAQ knowledge base for answers to common questions.\n    Uses AI to understand the question and find relevant answers.\n    \n    Examples:\n    - \"How do I return something?\" → return policy\n    - \"When will my order arrive?\" → shipping information\n    - \"Do you have warranties?\" → warranty details\n    \n    Args:\n        question: Customer's question about policies, shipping, etc.\n        \n    Returns:\n        JSON string with relevant FAQ answers\n    \"\"\"\n    global VECTORSTORE\n    \n    # Initialize vector store if not already done\n    if VECTORSTORE is None:\n        VECTORSTORE = initialize_vector_store()\n    \n    # Search FAQs\n    results = search_faqs(VECTORSTORE, question, k=2)\n    \n    if not results:\n        return json.dumps({\n            \"error\": \"No relevant FAQ found for this question\"\n        })\n    \n    # Format results\n    formatted_faqs = []\n    for result in results:\n        formatted_faqs.append({\n            \"question\": result[\"question\"],\n            \"answer\": result[\"answer\"],\n            \"category\": result[\"category\"],\n            \"relevance\": f\"{(1 - result['similarity_score']) * 100:.1f}%\"\n        })\n    \n    return json.dumps({\n        \"success\": True,\n        \"faqs\": formatted_faqs\n    })\n\n\n@tool\ndef process_refund_request(order_id: str, reason: str, customer_email: str) -&gt; str:\n    ",
+        "signatures": {},
+        "detailedLines": [
+          {
+            "text": "@tool",
+            "lineNumber": 218
+          },
+          {
+            "text": "def search_knowledge_base(question: str) -&gt; str:",
+            "lineNumber": 219,
+            "isSignature": true
+          },
+          {
+            "text": "    \"\"\"",
+            "lineNumber": 220
+          },
+          {
+            "text": "    Search the FAQ knowledge base for answers to common questions.",
+            "lineNumber": 221
+          },
+          {
+            "text": "    Uses AI to understand the question and find relevant answers.",
+            "lineNumber": 222
+          },
+          {
+            "text": "    ",
+            "lineNumber": 223
+          },
+          {
+            "text": "    Examples:",
+            "lineNumber": 224
+          },
+          {
+            "text": "    - \"How do I return something?\" → return policy",
+            "lineNumber": 225
+          },
+          {
+            "text": "    - \"When will my order arrive?\" → shipping information",
+            "lineNumber": 226
+          },
+          {
+            "text": "    - \"Do you have warranties?\" → warranty details",
+            "lineNumber": 227
+          },
+          {
+            "text": "    ",
+            "lineNumber": 228
+          },
+          {
+            "text": "    Args:",
+            "lineNumber": 229
+          },
+          {
+            "text": "        question: Customer's question about policies, shipping, etc.",
+            "lineNumber": 230
+          },
+          {
+            "text": "        ",
+            "lineNumber": 231
+          },
+          {
+            "text": "    Returns:",
+            "lineNumber": 232
+          },
+          {
+            "text": "        JSON string with relevant FAQ answers",
+            "lineNumber": 233
+          },
+          {
+            "text": "    \"\"\"",
+            "lineNumber": 234
+          },
+          {
+            "text": "    global VECTORSTORE",
+            "lineNumber": 235
+          },
+          {
+            "text": "    ",
+            "lineNumber": 236
+          },
+          {
+            "text": "    # Initialize vector store if not already done",
+            "lineNumber": 237
+          },
+          {
+            "text": "    if VECTORSTORE is None:",
+            "lineNumber": 238
+          },
+          {
+            "text": "        VECTORSTORE = initialize_vector_store()",
+            "lineNumber": 239
+          },
+          {
+            "text": "    ",
+            "lineNumber": 240
+          },
+          {
+            "text": "    # Search FAQs",
+            "lineNumber": 241
+          },
+          {
+            "text": "    results = search_faqs(VECTORSTORE, question, k=2)",
+            "lineNumber": 242
+          },
+          {
+            "text": "    ",
+            "lineNumber": 243
+          },
+          {
+            "text": "    if not results:",
+            "lineNumber": 244
+          },
+          {
+            "text": "        return json.dumps({",
+            "lineNumber": 245
+          },
+          {
+            "text": "            \"error\": \"No relevant FAQ found for this question\"",
+            "lineNumber": 246
+          },
+          {
+            "text": "        })",
+            "lineNumber": 247
+          },
+          {
+            "text": "    ",
+            "lineNumber": 248
+          },
+          {
+            "text": "    # Format results",
+            "lineNumber": 249
+          },
+          {
+            "text": "    formatted_faqs = []",
+            "lineNumber": 250
+          },
+          {
+            "text": "    for result in results:",
+            "lineNumber": 251
+          },
+          {
+            "text": "        formatted_faqs.append({",
+            "lineNumber": 252
+          },
+          {
+            "text": "            \"question\": result[\"question\"],",
+            "lineNumber": 253
+          },
+          {
+            "text": "            \"answer\": result[\"answer\"],",
+            "lineNumber": 254
+          },
+          {
+            "text": "            \"category\": result[\"category\"],",
+            "lineNumber": 255
+          },
+          {
+            "text": "            \"relevance\": f\"{(1 - result['similarity_score']) * 100:.1f}%\"",
+            "lineNumber": 256
+          },
+          {
+            "text": "        })",
+            "lineNumber": 257
+          },
+          {
+            "text": "    ",
+            "lineNumber": 258
+          },
+          {
+            "text": "    return json.dumps({",
+            "lineNumber": 259
+          },
+          {
+            "text": "        \"success\": True,",
+            "lineNumber": 260
+          },
+          {
+            "text": "        \"faqs\": formatted_faqs",
+            "lineNumber": 261
+          },
+          {
+            "text": "    })",
+            "lineNumber": 262,
+            "isSignature": true
+          },
+          {
+            "lineNumber": 263
+          },
+          {
+            "lineNumber": 264
+          },
+          {
+            "text": "@tool",
+            "lineNumber": 265
+          },
+          {
+            "text": "def process_refund_request(order_id: str, reason: str, customer_email: str) -&gt; str:",
+            "lineNumber": 266,
+            "isSignature": true
+          },
+          {
+            "text": "    ",
+            "lineNumber": 267
+          }
+        ]
+      },
+      "score": 0.44441425800323486
+    }
+  ]
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Comparing the Architecture section with the implementation. The diagram doesn't match the actual data flow. Updating it to reflect the correct flow:
+
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="read_file_v2">
+<details><summary>Tool use: **read_file_v2** • Read file: /home/amite/code/python/customer-service-agent/README.md</summary>
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+The Architecture diagram doesn't match the actual data flow. Issues:
+1. The vector store is called by tools, not directly by the LLM.
+2. The embedding model (mxbai-embed-large) is separate from the LLM and used by the vector store.
+3. The diagram doesn't show that only some tools use the vector store.
+
+Updating the Architecture section to reflect the correct flow:
+
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="edit_file_v2">
+<details>
+<summary>Tool use: **edit_file_v2**</summary>
+
+
+Parameters:
+
+```json
+{
+  "relativeWorkspacePath": "/home/amite/code/python/customer-service-agent/README.md"
+}
+```
+Additional data:
+
+```json
+{
+  "codeblockId": "140a6fa5-5912-4c85-aa00-14d53e422332"
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Updated the Architecture diagram to match the implementation. Changes:
+
+1. Clarified that the vector store is called by specific tools (not directly by the LLM).
+2. Added the embedding model (OllamaEmbeddings with mxbai-embed-large) as a separate component used by vector search tools.
+3. Showed that only some tools (`search_products_semantic` and `search_knowledge_base`) use the vector store, while others (`lookup_order`, `check_product_availability`, `process_refund_request`) are simple Python functions.
+4. Indicated that results flow back through the tools to the agent.
+
+The diagram now reflects:
+- The LLM decides which tool to call
+- Tools execute (some are simple, some use vector search)
+- Vector search tools use the embedding model → Qdrant
+- Results return to the agent for final response generation
+
+This matches the code where `search_products_semantic` and `search_knowledge_base` internally call `initialize_vector_store()` and `search_similar_products()`/`search_faqs()`, which use `OllamaEmbeddings` to query the `QdrantVectorStore`.
+
+---
+
+_**User**_
+
+please add and commit
+
+---
+
+_**Agent (model default, mode Agent)**_
+
+
+
+---
+
+
+Staging and committing the README.md changes.
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/amite/code/python/customer-service-agent && git add README.md</summary>
+
+```bash
+cd /home/amite/code/python/customer-service-agent && git add README.md
+```
+
+```
+fatal: not a git repository (or any of the parent directories): .git
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Checking if this is a git repository or if we need to initialize it:
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/amite/code/python/customer-service-agent && ls -la | grep -E "^d.*\.git$|^\.git"</summary>
+
+```bash
+cd /home/amite/code/python/customer-service-agent && ls -la | grep -E "^d.*\.git$|^\.git"
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Initializing a git repository, then staging and committing the changes:
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/amite/code/python/customer-service-agent && git init</summary>
+
+```bash
+cd /home/amite/code/python/customer-service-agent && git init
+```
+
+```
+Initialized empty Git repository in /home/amite/code/python/customer-service-agent/.git/
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint: 
+hint: 	git config --global init.defaultBranch &lt;name&gt;
+hint: 
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint: 
+hint: 	git branch -m &lt;name&gt;
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Staging and committing the changes:
+
+
+---
+
+<tool-use data-tool-type="shell" data-tool-name="run_terminal_command_v2">
+<details><summary>Tool use: **run_terminal_command_v2** • Run command: cd /home/amite/code/python/customer-service-agent && git add README.md && git commit -m "Update Architecture diagram to accurately reflect data flow
+
+- Clarify that vector store is called by specific tools, not directly by LLM
+- Add OllamaEmbeddings (mxbai-embed-large) as separate component
+- Show that only semantic search tools use vector store
+- Indicate result flow back through tools to agent"</summary>
+
+```bash
+cd /home/amite/code/python/customer-service-agent && git add README.md && git commit -m "Update Architecture diagram to accurately reflect data flow
+
+- Clarify that vector store is called by specific tools, not directly by LLM
+- Add OllamaEmbeddings (mxbai-embed-large) as separate component
+- Show that only semantic search tools use vector store
+- Indicate result flow back through tools to agent"
+```
+
+```
+[master (root-commit) 9394e42] Update Architecture diagram to accurately reflect data flow
+ 1 file changed, 740 insertions(+)
+ create mode 100644 README.md
+
+```
+</details>
+</tool-use>
+
+---
+
+
+
+---
+
+
+Committed the changes. The README.md update is now in the repository with a commit message describing the architecture diagram updates.
+
+The commit includes:
+- Updated architecture diagram showing the correct data flow
+- Clarification that the vector store is called by specific tools
+- Addition of the embedding model as a separate component
+- Better visualization of how results flow back to the agent
+
+Commit hash: `9394e42`
+
+---
+
