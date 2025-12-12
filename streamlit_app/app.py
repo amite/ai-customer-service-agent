@@ -6,6 +6,7 @@ Provides a chat interface with message history and agent reasoning display.
 """
 
 import streamlit as st
+from langchain_core.messages import HumanMessage, AIMessage
 from src.agents.customer_service_agent import (
     create_customer_service_agent,
     ORDERS,
@@ -77,6 +78,7 @@ with st.sidebar:
         1. "I need something for gaming"
         2. "Show me wireless audio equipment"
         3. "What do you have for ergonomic office setup?"
+        4. "what kind of laptops do you have?"
         
         **📦 Order Management:**
         4. "Can you look up order ORD-1001 for john.doe@email.com?"
@@ -162,7 +164,6 @@ if prompt := st.chat_input("Type your question here..."):
                 
                 # Update LangChain chat history for context
                 # This helps the agent remember previous conversation
-                from langchain_core.messages import HumanMessage, AIMessage
                 st.session_state.chat_history.extend([
                     HumanMessage(content=prompt),
                     AIMessage(content=assistant_response)

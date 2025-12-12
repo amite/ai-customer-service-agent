@@ -1,0 +1,42 @@
+# Python Virtual Environment Rules
+
+## Python Interpreter Usage
+- ALWAYS use the virtual environment Python interpreter: `.venv/bin/python` or `.venv/bin/python3`
+- NEVER use system `python` or `python3` commands directly
+- When running Python scripts, tests, or any Python commands, use `.venv/bin/python` or `.venv/bin/python3`
+
+## Package Management
+- ALWAYS use `uv` for package management (install, add, remove, sync, etc.)
+- NEVER use `pip` or `.venv/bin/pip` commands
+- Use `uv` commands that work with the project's virtual environment
+
+## Log Viewing and Tailing
+- ALWAYS use `tl` (toolong) for tailing and displaying logs
+- NEVER use `tail`, `less`, or other log viewing commands
+- Use `tl` for viewing log files and tailing logs
+
+## File Viewing
+- ALWAYS use `bat` for displaying file contents
+- NEVER use `cat` for viewing files
+- Use `bat` for reading and displaying any file contents
+
+## Examples
+- ✅ Correct: `.venv/bin/python script.py`
+- ✅ Correct: `.venv/bin/python -m pytest`
+- ✅ Correct: `.venv/bin/python3 streamlit_app/app.py`
+- ✅ Correct: `uv add package-name`
+- ✅ Correct: `uv sync`
+- ✅ Correct: `uv pip install package-name` (if needed)
+- ✅ Correct: `tl logfile.log`
+- ✅ Correct: `tl -f logfile.log` (for tailing)
+- ✅ Correct: `bat filename.py`
+- ✅ Correct: `bat README.md`
+- ❌ Wrong: `python script.py`
+- ❌ Wrong: `python3 -m pytest`
+- ❌ Wrong: `pip install package-name`
+- ❌ Wrong: `.venv/bin/pip install package-name`
+- ❌ Wrong: `tail logfile.log`
+- ❌ Wrong: `tail -f logfile.log`
+- ❌ Wrong: `cat logfile.log`
+- ❌ Wrong: `cat filename.py`
+- ❌ Wrong: `less logfile.log`

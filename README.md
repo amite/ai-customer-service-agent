@@ -1,6 +1,6 @@
-# LangChain Tool Calling Tutorial: Customer Service Agent 🤖
+# LangChain Tool Calling Project: Customer Service Agent 🤖
 
-A complete, production-ready example demonstrating **LangChain tool calling** with **Ollama** and **Streamlit**. This tutorial teaches you how to build AI agents that can call functions, manage state, and interact with structured data.
+A complete, production-ready example demonstrating **LangChain tool calling** with **Ollama** and **Streamlit**. This project teaches you how to build AI agents that can call functions, manage state, and interact with structured data.
 
 ## 📚 What You'll Learn
 
